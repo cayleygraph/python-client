@@ -1,4 +1,4 @@
-# Python Client for [Cayley](github.com/cayleygraph/cayley)
+# Python Client for [Cayley](https://github.com/cayleygraph/cayley)
 
 This is a work in progress official Python client for the next version of Cayley.
 
