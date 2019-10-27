@@ -11,6 +11,7 @@ from requests.exceptions import ConnectionError, HTTPError
 
 from .path import Path
 from .languages import QueryLanguage
+from .content_types import QueryContentType
 
 
 DEFAULT_CONNECT_TIMEOUT = 30
@@ -18,11 +19,6 @@ DEFAULT_CONNECT_INTERVAL = 0.1
 
 
 logger = logging.getLogger(__name__)
-
-
-class QueryContentType(Enum):
-    json = "application/json"
-    json_ld = "application/ld+json"
 
 
 @dataclass

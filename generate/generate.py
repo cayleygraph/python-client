@@ -2,7 +2,9 @@ import json
 from pathlib import Path
 from . import snake_case
 
-schema_path = Path(__file__).parent / "schema.json"
+directory = Path(__file__).parent
+schema_path = directory / "schema.json"
+header_path = directory / "header.py"
 
 def is_step_class(document):
     return (
@@ -48,31 +50,8 @@ def normalize_keywords(name):
     return name
 
 def generate() -> str:
-    text = """from typing import List, Iterator, TYPE_CHECKING
-from rdflib.term import Node
-
-from .languages import QueryLanguage
-
-if TYPE_CHECKING:
-    from .client import Client
-
-class Operator:
-    pass
-
-class Path:
-    def __init__(self, client: 'Client') -> None:
-        self.client = client
-        self.__cursor = None
-
-    def __add_step(self, step: dict) -> None:
-        prev_cursor = self.__cursor
-        self.__cursor = step
-        if prev_cursor:
-            self.__cursor = {**self.__cursor, "linkedql:from": prev_cursor}
-
-    def __iter__(self) -> Iterator:
-        self.client.query(self.__cursor, QueryLanguage.linkedql)
-"""
+    with header_path.open() as file:
+        text = file.read()
     with schema_path.open() as file:
         schema = json.load(file)
 
