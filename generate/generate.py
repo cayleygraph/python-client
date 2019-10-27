@@ -44,72 +44,82 @@ def range_to_type(_range):
 
 def normalize_keywords(name):
     if name in {"as", "is", "in", "except"}:
-        return "_" + name
+        return name + "_"
     return name
 
-def generate():
+def generate() -> str:
+    text = """from typing import List, Iterator, TYPE_CHECKING
+from rdflib.term import Node
+
+from .languages import QueryLanguage
+
+if TYPE_CHECKING:
+    from .client import Client
+
+class Operator:
+    pass
+
+class Path:
+    def __init__(self, client: 'Client') -> None:
+        self.client = client
+        self.__cursor = None
+
+    def __add_step(self, step: dict) -> None:
+        prev_cursor = self.__cursor
+        self.__cursor = step
+        if prev_cursor:
+            self.__cursor = {**self.__cursor, "linkedql:from": prev_cursor}
+
+    def __iter__(self) -> Iterator:
+        self.client.query(self.__cursor, QueryLanguage.linkedql)
+"""
     with schema_path.open() as file:
         schema = json.load(file)
-        step_classes = []
-        restrictions = {}
-        properties_by_domain = {}
 
-        for document in schema:
-            if is_restriction(document):
-                restrictions[document["@id"]] = document
-            if is_property(document):
-                class_properties = properties_by_domain.setdefault(document["rdfs:domain"]["@id"], [])
-                class_properties.append(document)
-            if is_step_class(document):
-                step_classes.append(document)
-        
-        print("""from typing import List
-    class Node:
-        pass
+    step_classes = []
+    restrictions = {}
+    properties_by_domain = {}
 
-    class Operator:
-        pass
+    for document in schema:
+        if is_restriction(document):
+            restrictions[document["@id"]] = document
+        if is_property(document):
+            class_properties = properties_by_domain.setdefault(document["rdfs:domain"]["@id"], [])
+            class_properties.append(document)
+        if is_step_class(document):
+            step_classes.append(document)
 
-    class Path:
-        def __init__(self):
-            self.cursor = None
-
-        def __add_step(self, step):
-            prev_cursor = self.cursor
-            self.cursor = step
-            if prev_cursor:
-                self.cursor = {**self.cursor, "linkedql:from": prev_cursor}""")
-
-        for step_class in step_classes:
-            single_properties = set()
-            for super_class in step_class["rdfs:subClassOf"]:
-                if super_class["@id"] in restrictions:
-                    restriction = restrictions[super_class["@id"]]
-                    if is_single_cardinality_restriction(restriction):
-                        _property = restriction["owl:onProperty"]
-                        single_properties.add(_property["@id"])
-            method_name = normalize_keywords(snake_case.convert(remove_linked_ql(step_class["@id"])))
-            method_str = f"def {method_name}("
-            arguments = ["self"]
-            mapping = {}
-            for _property in properties_by_domain.get(step_class["@id"]):
-                argument_name = remove_linked_ql(_property['@id'])
-                if argument_name == "from":
-                    continue
-                mapping[_property["@id"]] = argument_name
-                _type = range_to_type(_property["rdfs:range"])
-                if _property["@id"] not in single_properties:
-                    _type = "List[" + _type + "]"
-                arguments.append(f"{argument_name}: {_type}")
-            body = ",\n".join(
-                '            "' + key + '": ' + value
-                for key, value
-                in {"@type": '"' + step_class['@id'] + '"', **mapping}.items()
-            )
-            method_str += ", ".join(arguments) + f""") -> 'Path':
-            self.__add_step({{
-    {body}
-            }})
-            return self
-            """
-            print("    " + method_str)
+    for step_class in step_classes:
+        single_properties = set()
+        for super_class in step_class["rdfs:subClassOf"]:
+            if super_class["@id"] in restrictions:
+                restriction = restrictions[super_class["@id"]]
+                if is_single_cardinality_restriction(restriction):
+                    _property = restriction["owl:onProperty"]
+                    single_properties.add(_property["@id"])
+        method_name = normalize_keywords(snake_case.convert(remove_linked_ql(step_class["@id"])))
+        method_str = f"def {method_name}("
+        arguments = ["self"]
+        mapping = {}
+        for _property in properties_by_domain.get(step_class["@id"]):
+            argument_name = remove_linked_ql(_property['@id'])
+            if argument_name == "from":
+                continue
+            mapping[_property["@id"]] = argument_name
+            _type = range_to_type(_property["rdfs:range"])
+            if _property["@id"] not in single_properties:
+                _type = "List[" + _type + "]"
+            arguments.append(f"{argument_name}: {_type}")
+        body = ",\n".join(
+            '            "' + key + '": ' + value
+            for key, value
+            in {"@type": '"' + step_class['@id'] + '"', **mapping}.items()
+        )
+        method_str += ", ".join(arguments) + f""") -> 'Path':
+        self.__add_step({{
+{body}
+        }})
+        return self
+"""
+        text += "    " + method_str + "\n"
+    return text
