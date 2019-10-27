@@ -17,8 +17,10 @@ for node in client.g.vertex().limit(10):
 
 ### Development
 
+- Install dependencies: `pip install -r requirements.txt`
+
 The client uses the LinkedQL OWL schema file to generate the code for the client.
 
 - Copy `schema.json` to generate
 - Execute `python3 -m generate`
-- Test the generated code
+- Test with `python -m unittest cayley/*.py`
