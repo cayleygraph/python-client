@@ -6,5 +6,5 @@ It uses an OWL schema file to generate the code for the client.
 ### Development
 
 - Copy `schema.json` to generate
-- Execute `python3 -m generate > client.py`
+- Execute `python3 -m generate > path.py`
 - Test the generated code
