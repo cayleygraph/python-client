@@ -126,3 +126,4 @@ dmypy.json
 
 # Auto generated files
 cayley/path.py
+.vscode

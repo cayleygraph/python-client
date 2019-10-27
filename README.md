@@ -17,6 +17,8 @@ for node in client.g.vertex().limit(10):
 
 ### Development
 
+- Create a virtual environment: `python3 -m venv .venv`
+- Activate virtual environment: `source .venv/bin/activate`
 - Install dependencies: `pip install -r requirements.txt`
 
 The client uses the LinkedQL OWL schema file to generate the code for the client.
