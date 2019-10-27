@@ -24,10 +24,13 @@ class Path:
         if prev_cursor:
             self.__cursor = {**self.__cursor, "linkedql:from": prev_cursor}
 
-    def __iter__(self) -> Iterator:
+    def __execute(self):
         res = self.client.query(json.dumps(self.__cursor), QueryLanguage.linkedql, QueryContentType.json_ld)
         res = res.json()
         if "error" in res:
             raise QueryException(res["error"])
         return res["result"]
+
+    def __iter__(self) -> Iterator:
+        return iter(self.__execute())
 
