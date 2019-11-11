@@ -1,20 +1,30 @@
+"""
+The base module for the generated path module.
+Guidelines:
+ - Import modules, not names for explicitness about external dependencies
+"""
 import json
-from typing import List, Iterator, TYPE_CHECKING
-from rdflib.term import Node
+import typing
+import rdflib.term
 
 from .languages import QueryLanguage
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from .client import Client
+
 
 class Operator:
     pass
 
+
 class QueryException(Exception):
     pass
 
+
 class Path:
-    def __init__(self, client: 'Client') -> None:
+    __cursor: typing.Optional[dict]
+
+    def __init__(self, client: "Client") -> None:
         self.client = client
         self.__cursor = None
 
@@ -25,12 +35,14 @@ class Path:
             self.__cursor = {**self.__cursor, "linkedql:from": prev_cursor}
 
     def __execute(self):
-        res = self.client.query(json.dumps(self.__cursor), QueryLanguage.linkedql, QueryContentType.json_ld)
+        res = self.client.query(
+            json.dumps(self.__cursor), QueryLanguage.linkedql, QueryContentType.json_ld
+        )
         res = res.json()
         if "error" in res:
             raise QueryException(res["error"])
         return res["result"]
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> typing.Iterator:
         return iter(self.__execute())
 

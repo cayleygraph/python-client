@@ -6,26 +6,29 @@ directory = Path(__file__).parent
 schema_path = directory / "schema.json"
 header_path = directory / "header.py"
 
+
 def is_step_class(document):
-    return (
-        document["@type"] == "rdfs:Class"
-        and any(
-            super_class["@id"] == "linkedql:Step"
-            for super_class in document["rdfs:subClassOf"]
-        )
+    return document["@type"] == "rdfs:Class" and any(
+        super_class["@id"] == "linkedql:Step"
+        for super_class in document["rdfs:subClassOf"]
     )
+
 
 def is_restriction(document):
     return document["@type"] == "owl:Restriction"
 
+
 def is_single_cardinality_restriction(document):
     return document.get("owl:cardinality") is 1
+
 
 def is_property(document):
     return document["@type"] in {"owl:ObjectProperty", "owl:DatatypeProperty"}
 
+
 def remove_linked_ql(name):
     return name.replace("linkedql:", "")
+
 
 def range_to_type(_range):
     if _range["@id"] in {"linkedql:ValueStep", "linkedql:Step"}:
@@ -41,13 +44,15 @@ def range_to_type(_range):
     if _range["@id"] == "linkedql:Operator":
         return "Operator"
     if _range["@id"] == "rdfs:Resource":
-        return "Node"
+        return "rdflib.term.Node"
     raise Exception(f"Unexpected range: {_range}")
+
 
 def normalize_keywords(name):
     if name in {"as", "is", "in", "except"}:
         return name + "_"
     return name
+
 
 def generate() -> str:
     with header_path.open() as file:
@@ -63,7 +68,9 @@ def generate() -> str:
         if is_restriction(document):
             restrictions[document["@id"]] = document
         if is_property(document):
-            class_properties = properties_by_domain.setdefault(document["rdfs:domain"]["@id"], [])
+            class_properties = properties_by_domain.setdefault(
+                document["rdfs:domain"]["@id"], []
+            )
             class_properties.append(document)
         if is_step_class(document):
             step_classes.append(document)
@@ -76,29 +83,36 @@ def generate() -> str:
                 if is_single_cardinality_restriction(restriction):
                     _property = restriction["owl:onProperty"]
                     single_properties.add(_property["@id"])
-        method_name = normalize_keywords(snake_case.convert(remove_linked_ql(step_class["@id"])))
+        method_name = normalize_keywords(
+            snake_case.convert(remove_linked_ql(step_class["@id"]))
+        )
         method_str = f"def {method_name}("
         arguments = ["self"]
         mapping = {}
         for _property in properties_by_domain.get(step_class["@id"]):
-            argument_name = remove_linked_ql(_property['@id'])
+            argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
                 continue
             mapping[_property["@id"]] = argument_name
             _type = range_to_type(_property["rdfs:range"])
             if _property["@id"] not in single_properties:
-                _type = "List[" + _type + "]"
+                _type = "typing.List[" + _type + "]"
             arguments.append(f"{argument_name}: {_type}")
         body = ",\n".join(
             '            "' + key + '": ' + value
-            for key, value
-            in {"@type": '"' + step_class['@id'] + '"', **mapping}.items()
+            for key, value in {
+                "@type": '"' + step_class["@id"] + '"',
+                **mapping,
+            }.items()
         )
-        method_str += ", ".join(arguments) + f""") -> 'Path':
+        method_str += (
+            ", ".join(arguments)
+            + f""") -> 'Path':
         self.__add_step({{
 {body}
         }})
         return self
 """
+        )
         text += "    " + method_str + "\n"
     return text
