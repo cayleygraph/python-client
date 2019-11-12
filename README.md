@@ -17,12 +17,13 @@ for node in client.g.vertex().limit(10):
 
 ### Development
 
-- Create a virtual environment: `python3 -m venv .venv`
-- Activate virtual environment: `source .venv/bin/activate`
-- Install dependencies: `pip install -r requirements.txt`
+- If not installed, install `poetry` globally with `pip3 install poetry`
+
+In project's directory:
+
+- Install dependencies with `poetry install`
 
 The client uses the LinkedQL OWL schema file to generate the code for the client.
 
-- Copy `schema.json` to generate
-- Execute `python3 -m generate`
-- Test with `python -m unittest cayley/*.py`
+- Copy `schema.json` for generation
+- Test with `poetry run python test.py`
