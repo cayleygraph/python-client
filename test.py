@@ -1,4 +1,4 @@
 import subprocess
 
-subprocess.call(["python", "-m", "generate"])
-subprocess.call(["pytest"])
+subprocess.run(["python", "-m", "generate"], check=True)
+subprocess.run(["pytest"], check=True)
