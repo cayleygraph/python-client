@@ -10,7 +10,7 @@ class TestClient(unittest.TestCase):
     def test_init(self):
         try:
             import cayley
-            client = cayley.Client()
+            cayley.Client()
         except Exception as exception:
             self.fail(f"import raised {exception} unexpectedly!")
 

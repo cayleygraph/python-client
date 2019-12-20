@@ -29,7 +29,7 @@ class Client:
     g: Path = field(init=False)
 
     def __post_init__(self):
-        self.g = Path(self)
+        self.g = Path()
 
     def is_available(self, verbose: bool = False) -> bool:
         try:
@@ -93,7 +93,7 @@ class Client:
             headers["Accept"] = content_type.value
         res = self.session.post(
             self.endpoint + f"/api/v2/query",
-            data=query,
+            data=str(query),
             headers=headers,
             params={"lang": language.value},
         )

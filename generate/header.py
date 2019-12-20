@@ -6,11 +6,10 @@ Guidelines:
 import json
 import typing
 import rdflib.term
+from dataclasses import dataclass
 
 from .languages import QueryLanguage
-
-if typing.TYPE_CHECKING:
-    from .client import Client
+from .content_types import QueryContentType
 
 
 class Operator:
@@ -21,28 +20,24 @@ class QueryException(Exception):
     pass
 
 
-class Path:
-    __cursor: typing.Optional[dict]
+@dataclass
+class BasePath:
+    cursor: typing.Optional[dict] = None
 
-    def __init__(self, client: "Client") -> None:
-        self.client = client
-        self.__cursor = None
+    def __str__(self) -> str:
+        return json.dumps(self.cursor)
 
-    def __add_step(self, step: dict) -> None:
-        prev_cursor = self.__cursor
-        self.__cursor = step
-        if prev_cursor:
-            self.__cursor = {**self.__cursor, "linkedql:from": prev_cursor}
 
-    def __execute(self):
-        res = self.client.query(
-            json.dumps(self.__cursor), QueryLanguage.linkedql, QueryContentType.json_ld
-        )
-        res = res.json()
-        if "error" in res:
-            raise QueryException(res["error"])
-        return res["result"]
+@dataclass
+class FinalPath(BasePath):
+    pass
 
-    def __iter__(self) -> typing.Iterator:
-        return iter(self.__execute())
+
+@dataclass
+class Path(BasePath):
+    def __add_final_step(self, step: dict) -> "FinalPath":
+        return FinalPath({**step, "linkedql:from": self.cursor})
+
+    def __add_step(self, step: dict) -> "Path":
+        return Path({**step, "linkedql:from": self.cursor})
 

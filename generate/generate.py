@@ -1,8 +1,9 @@
 import ast
 import astor
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Iterator, Set
 from . import snake_case
 
 directory = Path(__file__).parent
@@ -10,22 +11,33 @@ schema_path = directory / "schema.json"
 header_path = directory / "header.py"
 
 
-def is_step_class(document):
-    return document["@type"] == "rdfs:Class" and any(
-        super_class["@id"] == "linkedql:Step"
-        for super_class in document["rdfs:subClassOf"]
+def normalize_list(obj) -> list:
+    if isinstance(obj, list):
+        return obj
+    return [obj]
+
+
+CLASS_TYPES: Set[str] = {"rdfs:Class", "owl:Class"}
+STEP_CLASSES_IDS: Set[str] = {"linkedql:PathStep", "linkedql:IteratorStep"}
+
+
+def is_step_class(document: dict) -> bool:
+    super_classes = normalize_list(document.get("rdfs:subClassOf", []))
+    super_classes_ids = {super_class["@id"] for super_class in super_classes}
+    return document["@type"] in CLASS_TYPES and bool(
+        STEP_CLASSES_IDS & super_classes_ids
     )
 
 
-def is_restriction(document):
+def is_restriction(document: dict) -> bool:
     return document["@type"] == "owl:Restriction"
 
 
-def is_single_cardinality_restriction(document):
-    return document.get("owl:cardinality") is 1
+def is_single_cardinality_restriction(document: dict) -> bool:
+    return document.get("owl:cardinality") == 1
 
 
-def is_property(document):
+def is_property(document: dict) -> bool:
     return document["@type"] in {"owl:ObjectProperty", "owl:DatatypeProperty"}
 
 
@@ -33,8 +45,8 @@ def remove_linked_ql(name):
     return name.replace("linkedql:", "")
 
 
-def range_to_type(_range) -> ast.expr:
-    if _range["@id"] in {"linkedql:ValueStep", "linkedql:Step"}:
+def range_to_type(_range: dict) -> ast.expr:
+    if _range["@id"] == "linkedql:PathStep":
         return ast.Str(s="Path")
     if _range["@id"] == "xsd:string":
         return ast.Name(id="str")
@@ -53,10 +65,19 @@ def range_to_type(_range) -> ast.expr:
     raise Exception(f"Unexpected range: {_range}")
 
 
-def normalize_keywords(name):
+def normalize_keywords(name: str) -> str:
     if name in {"as", "is", "in", "except"}:
         return name + "_"
     return name
+
+
+def get_domains(_property: dict) -> Iterator[dict]:
+    domain = _property["rdfs:domain"]
+    if "owl:unionOf" in domain:
+        for unionMember in domain["owl:unionOf"]["@list"]:
+            yield unionMember
+    else:
+        yield domain
 
 
 def generate() -> str:
@@ -72,20 +93,23 @@ def generate() -> str:
     restrictions: Dict[str, dict] = {}
     properties_by_domain: Dict[str, List[dict]] = {}
 
-    for document in schema:
+    for document in schema["@graph"]:
         if is_restriction(document):
             restrictions[document["@id"]] = document
         if is_property(document):
-            class_properties = properties_by_domain.setdefault(
-                document["rdfs:domain"]["@id"], []
-            )
-            class_properties.append(document)
+            for domain in get_domains(document):
+                domain = domain["@id"]
+                class_properties = properties_by_domain.setdefault(domain, [])
+                class_properties.append(document)
         if is_step_class(document):
             step_classes.append(document)
 
     for step_class in step_classes:
-        single_properties = set()
-        for super_class in step_class["rdfs:subClassOf"]:
+        single_properties: Set[str] = set()
+        is_path_step: bool = False
+        for super_class in normalize_list(step_class["rdfs:subClassOf"]):
+            if super_class["@id"] == "linkedql:PathStep":
+                is_path_step = True
             if super_class["@id"] in restrictions:
                 restriction = restrictions[super_class["@id"]]
                 if is_single_cardinality_restriction(restriction):
@@ -103,7 +127,7 @@ def generate() -> str:
             defaults=[],
         )
         name_to_property_name: Dict[str, ast.Str] = {}
-        for _property in properties_by_domain[step_class["@id"]]:
+        for _property in properties_by_domain.get(step_class["@id"], []):
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
                 continue
@@ -120,22 +144,21 @@ def generate() -> str:
         step_dict = ast.Dict(
             keys=[ast.Str("@type"), *keys], values=[ast.Str(step_class["@id"]), *values]
         )
+        returns = ast.Str(s="Path") if is_path_step else ast.Name(id="FinalPath")
+        method = "__add_step" if is_path_step else "__add_final_step"
         function_def = ast.FunctionDef(
             name=method_name,
             args=args,
-            returns=ast.Str(s="Path"),
+            returns=returns,
             decorator_list=[],
             body=[
-                ast.Expr(
+                ast.Return(
                     value=ast.Call(
-                        func=ast.Attribute(
-                            value=ast.Name(id="self"), attr="__add_step"
-                        ),
+                        func=ast.Attribute(value=ast.Name(id="self"), attr=method),
                         args=[step_dict],
                         keywords=[],
                     )
-                ),
-                ast.Return(value=ast.Name(id="self")),
+                )
             ],
         )
         class_def.body.append(function_def)
