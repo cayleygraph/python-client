@@ -62,6 +62,11 @@ def range_to_type(_range: dict) -> ast.expr:
         return ast.Attribute(
             value=ast.Attribute(value=ast.Name(id="rdflib"), attr="term"), attr="Node"
         )
+    if _range["@id"] == "owl:Thing":
+        return ast.Attribute(
+            value=ast.Attribute(value=ast.Name(id="rdflib"), attr="term"),
+            attr="Identifier",
+        )
     raise Exception(f"Unexpected range: {_range}")
 
 

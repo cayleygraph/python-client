@@ -26,10 +26,6 @@ class Client:
     endpoint: str = "http://localhost:64210"
     session: requests.Session = field(init=False, default_factory=requests.session)
     connected: bool = field(init=False, default=False)
-    g: Path = field(init=False)
-
-    def __post_init__(self):
-        self.g = Path()
 
     def is_available(self, verbose: bool = False) -> bool:
         try:
@@ -99,3 +95,6 @@ class Client:
         )
         res.raise_for_status()
         return res
+
+    def close(self):
+        self.session.close()
