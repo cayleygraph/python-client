@@ -36,7 +36,11 @@ def is_restriction(document: dict) -> bool:
 
 
 def is_single_cardinality_restriction(document: dict) -> bool:
-    return document.get("owl:cardinality") == 1
+    return is_restriction(document) and document.get("owl:cardinality") == 1
+
+
+def is_emptyable_cardinality_restriction(document: dict) -> bool:
+    return is_restriction(document) and document.get("owl:minCardinality") == 0
 
 
 def is_property(document: dict) -> bool:
@@ -114,6 +118,83 @@ def get_domains(_property: dict) -> Iterator[dict]:
         yield domain
 
 
+def add_method(
+    module,
+    class_def,
+    step_class,
+    properties,
+    is_path_step,
+    single_properties,
+    method_name,
+):
+    mapping: List[Tuple[ast.Constant, ast.Expr]] = [
+        (ast.Constant("@type"), ast.Constant(step_class["@id"]))
+    ]
+    is_method: bool = False
+    sorted_properties = sorted(
+        properties,
+        key=lambda _property: ""
+        if _property["@id"] == "linkedql:from"
+        else _property["@id"],
+    )
+    positional_args = []
+    kwonlyargs = []
+    for _property in sorted_properties:
+        argument_name = remove_linked_ql(_property["@id"])
+        if argument_name == "from":
+            is_method = True
+            positional_args.append(ast.arg(arg="self", annotation=None))
+            value = ast.Attribute(value=ast.Name(id="self"), attr="step")
+            mapping.append((ast.Constant(_property["@id"]), value))
+            continue
+        mapping.append((ast.Constant(_property["@id"]), ast.Name(argument_name)))
+        _type = range_to_type(_property["rdfs:range"])
+        if _property["@id"] not in single_properties:
+            _type = ast.Subscript(
+                value=ast.Attribute(value=ast.Name(id="typing"), attr="List"),
+                slice=ast.Index(value=_type),
+            )
+        arg = ast.arg(arg=argument_name, annotation=_type)
+        if len(properties) <= 2:
+            positional_args.append(arg)
+        else:
+            kwonlyargs.append(arg)
+    args = ast.arguments(
+        args=positional_args,
+        vararg=None,
+        kwonlyargs=kwonlyargs or None,
+        kw_defaults=[],
+        kwarg=None,
+        defaults=[],
+    )
+    keys, values = zip(*mapping)
+    step_dict = ast.Dict(keys=keys, values=values)
+    return_type = ast.Name("Path" if is_path_step else "FinalPath")
+    returns = ast.Constant("Path") if is_path_step else ast.Name(id="FinalPath")
+    comment = step_class["rdfs:comment"]
+    if is_method:
+        docstring_indent = " " * 8
+    else:
+        docstring_indent = " " * 4
+    docstring = ast.Expr(
+        ast.Constant(f"\n{docstring_indent + comment}\n{docstring_indent}")
+    )
+    function_def = ast.FunctionDef(
+        name=method_name,
+        args=args,
+        returns=returns,
+        decorator_list=[],
+        body=[
+            docstring,
+            ast.Return(value=ast.Call(func=return_type, args=[step_dict], keywords=[])),
+        ],
+    )
+    if is_method:
+        class_def.body.append(function_def)
+    else:
+        module.body.append(function_def)
+
+
 def generate(module_path: Path) -> str:
     module = astor.code_to_ast.parse_file(header_path)
     # print(astor.dump_tree(tree))
@@ -138,87 +219,46 @@ def generate(module_path: Path) -> str:
 
     for step_class in step_classes:
         single_properties: Set[str] = set()
+        emptyable_properties: Set[str] = set()
         is_path_step: bool = False
         for super_class in normalize_list(step_class["rdfs:subClassOf"]):
             if super_class["@id"] == "linkedql:PathStep":
                 is_path_step = True
-            if is_restriction(super_class) and is_single_cardinality_restriction(
-                super_class
-            ):
+            if is_single_cardinality_restriction(super_class):
                 _property = super_class["owl:onProperty"]
                 single_properties.add(_property["@id"])
+            if is_emptyable_cardinality_restriction(super_class):
+                _property = super_class["owl:onProperty"]
+                emptyable_properties.add(_property["@id"])
         method_name = normalize_keywords(
             snake_case.convert(remove_linked_ql(step_class["@id"]))
         )
-        is_method: bool = False
-        mapping: List[Tuple[ast.Constant, ast.Expr]] = [
-            (ast.Constant("@type"), ast.Constant(step_class["@id"]))
-        ]
         properties = properties_by_domain.get(step_class["@id"], [])
-        sorted_properties = sorted(
+        add_method(
+            module,
+            class_def,
+            step_class,
             properties,
-            key=lambda _property: ""
-            if _property["@id"] == "linkedql:from"
-            else _property["@id"],
+            is_path_step,
+            single_properties,
+            method_name,
         )
-        positional_args = []
-        kwonlyargs = []
-        for _property in sorted_properties:
-            argument_name = remove_linked_ql(_property["@id"])
-            if argument_name == "from":
-                is_method = True
-                positional_args.append(ast.arg(arg="self", annotation=None))
-                value = ast.Attribute(value=ast.Name(id="self"), attr="step")
-                mapping.append((ast.Constant(_property["@id"]), value))
-                continue
-            mapping.append((ast.Constant(_property["@id"]), ast.Name(argument_name)))
-            _type = range_to_type(_property["rdfs:range"])
-            if _property["@id"] not in single_properties:
-                _type = ast.Subscript(
-                    value=ast.Attribute(value=ast.Name(id="typing"), attr="List"),
-                    slice=ast.Index(value=_type),
-                )
-            arg = ast.arg(arg=argument_name, annotation=_type)
-            if len(properties) <= 2:
-                positional_args.append(arg)
-            else:
-                kwonlyargs.append(arg)
-        args = ast.arguments(
-            args=positional_args,
-            vararg=None,
-            kwonlyargs=kwonlyargs or None,
-            kw_defaults=[],
-            kwarg=None,
-            defaults=[],
-        )
-        keys, values = zip(*mapping)
-        step_dict = ast.Dict(keys=keys, values=values)
-        return_type = ast.Name("Path" if is_path_step else "FinalPath")
-        returns = ast.Constant("Path") if is_path_step else ast.Name(id="FinalPath")
-        comment = step_class["rdfs:comment"]
-        if is_method:
-            docstring_indent = " " * 8
-        else:
-            docstring_indent = " " * 4
-        docstring = ast.Expr(
-            ast.Constant(f"\n{docstring_indent + comment}\n{docstring_indent}")
-        )
-        function_def = ast.FunctionDef(
-            name=method_name,
-            args=args,
-            returns=returns,
-            decorator_list=[],
-            body=[
-                docstring,
-                ast.Return(
-                    value=ast.Call(func=return_type, args=[step_dict], keywords=[])
-                ),
-            ],
-        )
-        if is_method:
-            class_def.body.append(function_def)
-        else:
-            module.body.append(function_def)
+        if "linkedql:from" in emptyable_properties:
+            properties = [
+                _property
+                for _property in properties
+                if _property["@id"] != "linkedql:from"
+            ]
+            add_method(
+                module,
+                class_def,
+                step_class,
+                properties,
+                is_path_step,
+                single_properties,
+                method_name,
+            )
+
     generated_code = astor.to_source(module)
     with module_path.open("w+") as file:
         file.write(generated_code)
