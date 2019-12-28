@@ -3,7 +3,7 @@ import astor
 import json
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict, List, Iterator, Set
+from typing import Dict, List, Tuple, Iterator, Set
 from . import snake_case
 
 directory = Path(__file__).parent
@@ -146,17 +146,22 @@ def generate() -> str:
         method_name = normalize_keywords(
             snake_case.convert(remove_linked_ql(step_class["@id"]))
         )
-        name_to_property_name: Dict[str, ast.Constant] = {}
+        is_method: bool = False
+        mapping: List[Tuple[ast.Constant, ast.Expr]] = [
+            (ast.Constant("@type"), ast.Constant(step_class["@id"]))
+        ]
         properties = properties_by_domain.get(step_class["@id"], [])
         positional_args = []
         kwonlyargs = []
         for _property in sorted(properties, key=lambda _property: _property["@id"]):
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
+                is_method = True
                 positional_args.append(ast.arg(arg="self", annotation=None))
-                name_to_property_name["self"] = ast.Constant(_property["@id"])
+                value = ast.Attribute(value=ast.Name(id="self"), attr="step")
+                mapping.append((ast.Constant(_property["@id"]), value))
                 continue
-            name_to_property_name[argument_name] = ast.Constant(_property["@id"])
+            mapping.append((ast.Constant(_property["@id"]), ast.Name(argument_name)))
             _type = range_to_type(_property["rdfs:range"])
             if _property["@id"] not in single_properties:
                 _type = ast.Subscript(
@@ -176,16 +181,11 @@ def generate() -> str:
             kwarg=None,
             defaults=[],
         )
-        values = [ast.Name(name) for name in name_to_property_name.keys()]
-        keys = [name_to_property_name[value.id] for value in values]
-        step_dict = ast.Dict(
-            keys=[ast.Constant("@type"), *keys],
-            values=[ast.Constant(step_class["@id"]), *values],
-        )
+        keys, values = zip(*mapping)
+        step_dict = ast.Dict(keys=keys, values=values)
         return_type = ast.Name("Path" if is_path_step else "FinalPath")
         returns = ast.Constant("Path") if is_path_step else ast.Name(id="FinalPath")
         comment = step_class["rdfs:comment"]
-        is_method = "self" in name_to_property_name
         if is_method:
             docstring_indent = " " * 8
         else:
@@ -205,7 +205,7 @@ def generate() -> str:
                 ),
             ],
         )
-        if "self" in name_to_property_name:
+        if is_method:
             class_def.body.append(function_def)
         else:
             module.body.append(function_def)
