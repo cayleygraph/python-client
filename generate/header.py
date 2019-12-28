@@ -27,10 +27,10 @@ class QueryException(Exception):
 
 @dataclass
 class BasePath:
-    cursor: typing.Optional[dict] = None
+    step: dict
 
     def __str__(self) -> str:
-        return json.dumps({"@context": CONTEXT, **self.cursor})
+        return json.dumps({"@context": CONTEXT, **self.step})
 
 
 @dataclass
@@ -40,15 +40,5 @@ class FinalPath(BasePath):
 
 @dataclass
 class Path(BasePath):
-    def __add_final_step(self, step: dict) -> "FinalPath":
-        if self.cursor is None:
-            raise RuntimeError(
-                f"Can not call step {step['@id']} before calling another step first"
-            )
-        return FinalPath({**step, "linkedql:from": self.cursor})
+    pass
 
-    def __add_step(self, step: dict) -> "Path":
-        new_step = copy(step)
-        if self.cursor:
-            new_step["linkedql:from"] = self.cursor
-        return Path(new_step)

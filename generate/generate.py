@@ -118,6 +118,7 @@ def generate() -> str:
 
     class_def = module.body[-1]
     assert isinstance(class_def, ast.ClassDef) and class_def.name == "Path"
+    del class_def.body[-1]
 
     step_classes: List[dict] = []
     properties_by_domain: Dict[str, List[dict]] = {}
@@ -152,6 +153,7 @@ def generate() -> str:
         for _property in sorted(properties, key=lambda _property: _property["@id"]):
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
+                name_to_property_name["self"] = ast.Constant(_property["@id"])
                 continue
             name_to_property_name[argument_name] = ast.Constant(_property["@id"])
             _type = range_to_type(_property["rdfs:range"])
@@ -179,10 +181,14 @@ def generate() -> str:
             keys=[ast.Constant("@type"), *keys],
             values=[ast.Constant(step_class["@id"]), *values],
         )
+        return_type = ast.Name("Path" if is_path_step else "FinalPath")
         returns = ast.Constant("Path") if is_path_step else ast.Name(id="FinalPath")
-        method = "__add_step" if is_path_step else "__add_final_step"
         comment = step_class["rdfs:comment"]
-        docstring_indent = " " * 8
+        is_method = "self" in name_to_property_name
+        if is_method:
+            docstring_indent = " " * 8
+        else:
+            docstring_indent = " " * 4
         docstring = ast.Expr(
             ast.Constant(f"\n{docstring_indent + comment}\n{docstring_indent}")
         )
@@ -194,13 +200,12 @@ def generate() -> str:
             body=[
                 docstring,
                 ast.Return(
-                    value=ast.Call(
-                        func=ast.Attribute(value=ast.Name(id="self"), attr=method),
-                        args=[step_dict],
-                        keywords=[],
-                    )
+                    value=ast.Call(func=return_type, args=[step_dict], keywords=[])
                 ),
             ],
         )
-        class_def.body.append(function_def)
+        if "self" in name_to_property_name:
+            class_def.body.append(function_def)
+        else:
+            module.body.append(function_def)
     return astor.to_source(module)
