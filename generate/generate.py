@@ -145,16 +145,11 @@ def generate() -> str:
         method_name = normalize_keywords(
             snake_case.convert(remove_linked_ql(step_class["@id"]))
         )
-        args = ast.arguments(
-            args=[ast.arg(arg="self", annotation=None)],
-            vararg=None,
-            kwonlyargs=None,
-            kw_defaults=None,
-            kwarg=None,
-            defaults=[],
-        )
         name_to_property_name: Dict[str, ast.Str] = {}
-        for _property in properties_by_domain.get(step_class["@id"], []):
+        properties = properties_by_domain.get(step_class["@id"], [])
+        positional_args = [ast.arg(arg="self", annotation=None)]
+        kwonlyargs = []
+        for _property in sorted(properties, key=lambda _property: _property["@id"]):
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
                 continue
@@ -165,9 +160,21 @@ def generate() -> str:
                     value=ast.Attribute(value=ast.Name(id="typing"), attr="List"),
                     slice=ast.Index(value=_type),
                 )
-            args.args.append(ast.arg(arg=argument_name, annotation=_type))
-        keys = [name_to_property_name[arg.arg] for arg in args.args[1:]]
-        values = [ast.Name(arg.arg) for arg in args.args[1:]]
+            arg = ast.arg(arg=argument_name, annotation=_type)
+            if len(properties) <= 2:
+                positional_args.append(arg)
+            else:
+                kwonlyargs.append(arg)
+        args = ast.arguments(
+            args=positional_args,
+            vararg=None,
+            kwonlyargs=kwonlyargs or None,
+            kw_defaults=[],
+            kwarg=None,
+            defaults=[],
+        )
+        values = [ast.Name(name) for name in name_to_property_name.keys()]
+        keys = [name_to_property_name[value.id] for value in values]
         step_dict = ast.Dict(
             keys=[ast.Str("@type"), *keys], values=[ast.Str(step_class["@id"]), *values]
         )
