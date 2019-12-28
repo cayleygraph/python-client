@@ -14,6 +14,7 @@ rdflib = "^4.2"
 pytest = "^3.0"
 black = {version = "^18.3-alpha.0", allow-prereleases = true}
 mypy = "^0.740.0"
+rope = "^0.14.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
