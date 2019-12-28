@@ -30,7 +30,7 @@ def is_step_class(document: dict) -> bool:
 
 
 def is_restriction(document: dict) -> bool:
-    return document["@type"] == "owl:Restriction"
+    return document.get("@type") == "owl:Restriction"
 
 
 def is_single_cardinality_restriction(document: dict) -> bool:
@@ -46,23 +46,48 @@ def remove_linked_ql(name):
 
 
 def range_to_type(_range: dict) -> ast.expr:
-    if _range["@id"] == "linkedql:PathStep":
+    _id = _range["@id"]
+    if _id == "linkedql:PathStep":
         return ast.Str(s="Path")
-    if _range["@id"] == "xsd:string":
+    if _id == "linkedql:PropertyPath":
+        return ast.Subscript(
+            value=ast.Attribute(value=ast.Name(id="typing"), attr="Union"),
+            slice=ast.Index(
+                value=ast.ExtSlice(
+                    [
+                        ast.Name(id="str"),
+                        ast.Subscript(
+                            value=ast.Attribute(
+                                value=ast.Name(id="typing"), attr="List"
+                            ),
+                            slice=ast.Index(ast.Name("str")),
+                        ),
+                    ]
+                )
+            ),
+        )
+    if _id == "rdf:JSON":
+        return ast.Subscript(
+            value=ast.Attribute(value=ast.Name(id="typing"), attr="Dict"),
+            slice=ast.Index(
+                value=ast.ExtSlice([ast.Name(id="str"), ast.Name(id="str")])
+            ),
+        )
+    if _id == "xsd:string":
         return ast.Name(id="str")
-    if _range["@id"] == "xsd:int":
+    if _id == "xsd:int":
         return ast.Name(id="int")
-    if _range["@id"] == "xsd:float":
+    if _id == "xsd:float":
         return ast.Name(id="float")
-    if _range["@id"] == "xsd:boolean":
+    if _id == "xsd:boolean":
         return ast.Name(id="bool")
-    if _range["@id"] == "linkedql:Operator":
+    if _id == "linkedql:Operator":
         return ast.Name(id="Operator")
-    if _range["@id"] == "rdfs:Resource":
+    if _id == "rdfs:Resource":
         return ast.Attribute(
             value=ast.Attribute(value=ast.Name(id="rdflib"), attr="term"), attr="Node"
         )
-    if _range["@id"] == "owl:Thing":
+    if _id == "owl:Thing":
         return ast.Attribute(
             value=ast.Attribute(value=ast.Name(id="rdflib"), attr="term"),
             attr="Identifier",
@@ -95,12 +120,9 @@ def generate() -> str:
     assert isinstance(class_def, ast.ClassDef) and class_def.name == "Path"
 
     step_classes: List[dict] = []
-    restrictions: Dict[str, dict] = {}
     properties_by_domain: Dict[str, List[dict]] = {}
 
     for document in schema["@graph"]:
-        if is_restriction(document):
-            restrictions[document["@id"]] = document
         if is_property(document):
             for domain in get_domains(document):
                 domain = domain["@id"]
@@ -115,11 +137,11 @@ def generate() -> str:
         for super_class in normalize_list(step_class["rdfs:subClassOf"]):
             if super_class["@id"] == "linkedql:PathStep":
                 is_path_step = True
-            if super_class["@id"] in restrictions:
-                restriction = restrictions[super_class["@id"]]
-                if is_single_cardinality_restriction(restriction):
-                    _property = restriction["owl:onProperty"]
-                    single_properties.add(_property["@id"])
+            if is_restriction(super_class) and is_single_cardinality_restriction(
+                super_class
+            ):
+                _property = super_class["owl:onProperty"]
+                single_properties.add(_property["@id"])
         method_name = normalize_keywords(
             snake_case.convert(remove_linked_ql(step_class["@id"]))
         )
