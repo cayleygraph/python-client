@@ -48,7 +48,7 @@ def remove_linked_ql(name):
 def range_to_type(_range: dict) -> ast.expr:
     _id = _range["@id"]
     if _id == "linkedql:PathStep":
-        return ast.Str(s="Path")
+        return ast.Constant("Path")
     if _id == "linkedql:PropertyPath":
         return ast.Subscript(
             value=ast.Attribute(value=ast.Name(id="typing"), attr="Union"),
@@ -145,7 +145,7 @@ def generate() -> str:
         method_name = normalize_keywords(
             snake_case.convert(remove_linked_ql(step_class["@id"]))
         )
-        name_to_property_name: Dict[str, ast.Str] = {}
+        name_to_property_name: Dict[str, ast.Constant] = {}
         properties = properties_by_domain.get(step_class["@id"], [])
         positional_args = [ast.arg(arg="self", annotation=None)]
         kwonlyargs = []
@@ -153,7 +153,7 @@ def generate() -> str:
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
                 continue
-            name_to_property_name[argument_name] = ast.Str(_property["@id"])
+            name_to_property_name[argument_name] = ast.Constant(_property["@id"])
             _type = range_to_type(_property["rdfs:range"])
             if _property["@id"] not in single_properties:
                 _type = ast.Subscript(
@@ -176,23 +176,30 @@ def generate() -> str:
         values = [ast.Name(name) for name in name_to_property_name.keys()]
         keys = [name_to_property_name[value.id] for value in values]
         step_dict = ast.Dict(
-            keys=[ast.Str("@type"), *keys], values=[ast.Str(step_class["@id"]), *values]
+            keys=[ast.Constant("@type"), *keys],
+            values=[ast.Constant(step_class["@id"]), *values],
         )
-        returns = ast.Str(s="Path") if is_path_step else ast.Name(id="FinalPath")
+        returns = ast.Constant("Path") if is_path_step else ast.Name(id="FinalPath")
         method = "__add_step" if is_path_step else "__add_final_step"
+        comment = step_class["rdfs:comment"]
+        docstring_indent = " " * 8
+        docstring = ast.Expr(
+            ast.Constant(f"\n{docstring_indent + comment}\n{docstring_indent}")
+        )
         function_def = ast.FunctionDef(
             name=method_name,
             args=args,
             returns=returns,
             decorator_list=[],
             body=[
+                docstring,
                 ast.Return(
                     value=ast.Call(
                         func=ast.Attribute(value=ast.Name(id="self"), attr=method),
                         args=[step_dict],
                         keywords=[],
                     )
-                )
+                ),
             ],
         )
         class_def.body.append(function_def)
