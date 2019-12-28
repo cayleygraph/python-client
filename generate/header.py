@@ -17,6 +17,10 @@ from .languages import QueryLanguage
 CONTEXT = {"linkedql": "http://cayley.io/linkedql#"}
 
 
+Document = typing.Dict[str, typing.Any]
+GraphPattern = typing.Union[typing.List[Document], Document]
+
+
 class Operator:
     pass
 

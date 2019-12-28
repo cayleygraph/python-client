@@ -66,6 +66,8 @@ def range_to_type(_range: dict) -> ast.expr:
                 )
             ),
         )
+    if _id == "rdfg:Graph":
+        return ast.Name("GraphPattern")
     if _id == "rdf:JSON":
         return ast.Subscript(
             value=ast.Attribute(value=ast.Name(id="typing"), attr="Dict"),
