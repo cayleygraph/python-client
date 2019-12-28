@@ -1,9 +1,11 @@
 import ast
-import astor
 import json
-from collections.abc import Iterable
+import subprocess
 from pathlib import Path
+from collections.abc import Iterable
+import astor
 from typing import Dict, List, Tuple, Iterator, Set
+import black
 from . import snake_case
 
 directory = Path(__file__).parent
@@ -112,7 +114,7 @@ def get_domains(_property: dict) -> Iterator[dict]:
         yield domain
 
 
-def generate() -> str:
+def generate(module_path: Path) -> str:
     module = astor.code_to_ast.parse_file(header_path)
     # print(astor.dump_tree(tree))
     with schema_path.open() as file:
@@ -153,9 +155,15 @@ def generate() -> str:
             (ast.Constant("@type"), ast.Constant(step_class["@id"]))
         ]
         properties = properties_by_domain.get(step_class["@id"], [])
+        sorted_properties = sorted(
+            properties,
+            key=lambda _property: ""
+            if _property["@id"] == "linkedql:from"
+            else _property["@id"],
+        )
         positional_args = []
         kwonlyargs = []
-        for _property in sorted(properties, key=lambda _property: _property["@id"]):
+        for _property in sorted_properties:
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
                 is_method = True
@@ -211,4 +219,8 @@ def generate() -> str:
             class_def.body.append(function_def)
         else:
             module.body.append(function_def)
-    return astor.to_source(module)
+    generated_code = astor.to_source(module)
+    with module_path.open("w+") as file:
+        file.write(generated_code)
+    subprocess.run(["black", str(module_path)])
+

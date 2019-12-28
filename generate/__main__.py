@@ -4,6 +4,6 @@ from .generate import generate
 
 module_path = Path(__file__).parent.parent / "cayley" / "path.py"
 
-with module_path.open("w+") as file:
-    file.write(generate())
+generate(module_path)
+
 print(f"Generated {module_path}", file=sys.stderr)
