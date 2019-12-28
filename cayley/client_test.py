@@ -24,8 +24,7 @@ class TestClient(unittest.TestCase):
         cayley = self._import()
         prefix = "http://example.org/"
         (
-            cayley.path.Path()
-            .vertex([])
+            cayley.path.vertex([])
             .properties([prefix + "name", prefix + "likes"])
             .select(tags=[])
         )
