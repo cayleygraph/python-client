@@ -11,7 +11,7 @@ import cayley
 
 client = cayley.Client()
 
-for node in client.g.vertex().limit(10):
+for node in client.query(cayley.path.vertex().limit(10)):
     print(node)
 ```
 
