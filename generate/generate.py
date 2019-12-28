@@ -148,11 +148,12 @@ def generate() -> str:
         )
         name_to_property_name: Dict[str, ast.Constant] = {}
         properties = properties_by_domain.get(step_class["@id"], [])
-        positional_args = [ast.arg(arg="self", annotation=None)]
+        positional_args = []
         kwonlyargs = []
         for _property in sorted(properties, key=lambda _property: _property["@id"]):
             argument_name = remove_linked_ql(_property["@id"])
             if argument_name == "from":
+                positional_args.append(ast.arg(arg="self", annotation=None))
                 name_to_property_name["self"] = ast.Constant(_property["@id"])
                 continue
             name_to_property_name[argument_name] = ast.Constant(_property["@id"])
