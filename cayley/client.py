@@ -80,8 +80,8 @@ class Client:
     def query(
         self,
         query: str,
-        language: QueryLanguage,
-        content_type: Optional[QueryContentType] = None,
+        language: QueryLanguage = QueryLanguage.linkedql,
+        content_type: Optional[QueryContentType] = QueryContentType.json_ld,
     ) -> requests.Response:
         self._ensure_connection()
         headers = {}
