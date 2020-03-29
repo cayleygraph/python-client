@@ -1,1559 +1,1668 @@
 {
-	"@context": {
-		"linkedql": "http://cayley.io/linkedql#",
-		"owl": "http://www.w3.org/2002/07/owl#",
-		"rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-		"rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
-		"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-		"xsd": "http://www.w3.org/2001/XMLSchema#"
-	},
-	"@graph": [
-		{
-			"@id": "linkedql:Step",
-			"@type": "owl:Class"
-		},
-		{
-			"@id": "linkedql:PathStep",
-			"@type": "owl:Class",
-			"rdfs:subClassOf": {
-				"@id": "linkedql:Step"
-			}
-		},
-		{
-			"@id": "linkedql:IteratorStep",
-			"@type": "owl:Class",
-			"rdfs:subClassOf": {
-				"@id": "linkedql:Step"
-			}
-		},
-		{
-			"@id": "linkedql:In",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "aliases for ViewReverse",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n1038558163315711800",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n283959380165108124",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:properties"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Labels",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "gets the list of inbound and outbound quad labels",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n1819156587574370303",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:LessThanEquals",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Less than equals filters out values that are not less than or equal given value",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n3164054682105486650",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n5024789707532034556",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:value"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Match",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "filters all paths which are, at this point, on the subject for the given predicate and object, but do not follow the path, merely filter the possible paths. Usually useful for starting with all nodes, or limiting to a subset depending on some predicate/value pair.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n5301226092434977398",
-					"@type": "owl:Restriction",
-					"owl:minCardinality": 0,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n8716497387567229529",
-					"@type": "owl:Restriction",
-					"owl:maxCardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n7852775551921137412",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:pattern"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Order",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "sorts the results in ascending order according to the current entity / value",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n3658872193018448100",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Properties",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "adds tags for all properties of the current entity",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7637536927116973669",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Skip",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "skips a number of nodes for current path.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n5077608335019924692",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n6613630632040425599",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:offset"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Difference",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to all the values resolved by the from step different then the values resolved by the provided steps. Caution: it might be slow to execute.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n1536285285527346291",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Vertex",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to all the existing objects and primitive values in the graph. If provided with values resolves to a sublist of all the existing values in the graph.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Unique",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "removes duplicate values from the path.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7347034650713655932",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:GreaterThan",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Greater than equals filters out values that are not greater than given value",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n5977115136010412128",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n4056461314704293734",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:value"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:GreaterThanEquals",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Greater than equals filters out values that are not greater than or equal given value",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7737537111259429946",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n3079632514980023566",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:value"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:LessThan",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Less than filters out values that are not less than given value",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n809582479451694724",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n1856249409479609169",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:value"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Select",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Select returns flat records of tags matched in the query",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n8398440708525837452",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Where",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "applies each provided step in steps in isolation on from",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n4031854614845536906",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Entities",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to all the existing objects in the graph. If provided with identifiers resolves to a sublist of all the existing identifiers in the graph.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				}
-			]
-		},
-		{
-			"@id": "linkedql:FollowReverse",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "is the same as follow but follows the chain in the reverse direction. Flips View and ViewReverse where appropriate, the net result being a virtual predicate followed in the reverse direction. Starts at the end of the morphism and follows it backwards (with appropriate flipped directions) to the g.M() location.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7987116517896386359",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n1610529791769422138",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:followed"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:PropertyNames",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "gets the list of predicates that are pointing out from a node.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n515319285374152519",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Value",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Value returns a single value matched in the query",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n980082518315102497",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:VisitReverse",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "is the inverse of View. Starting with the nodes in `path` on the object, follow the quads with predicates defined by `predicatePath` to their subjects.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n2166813031420109495",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n2469908528563602441",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:properties"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Filter",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "applies constraints to a set of nodes. Can be used to filter values by range or match strings.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n8206293256313225462",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n3965004768193134674",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:filter"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:HasReverse",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "is the same as Has, but sets constraint in reverse direction.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n3133514587142444758",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n8584478957125365260",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:property"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Union",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "returns the combined paths of the two queries. Notice that it's per-path, not per-node. Once again, if multiple paths reach the same destination, they might have had different ways of getting there (and different tags).",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n3389755726511038789",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Count",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to the number of the resolved values of the from step",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n6723570751135975869",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Intersect",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to all the same values resolved by the from step and the provided steps.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7609388359991689077",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Has",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "filters all paths which are, at this point, on the subject for the given predicate and object, but do not follow the path, merely filter the possible paths. Usually useful for starting with all nodes, or limiting to a subset depending on some predicate/value pair.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n5955606376209887118",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n2895391043721979612",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:property"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Optional",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "attempts to follow the given path from the current entity / value, if fails the entity / value will still be kept in the results",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n9180518303311551145",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n1593161009555034620",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:step"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Placeholder",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "is like Vertex but resolves to the values in the context it is placed in. It should only be used where a linkedql.PathStep is expected and can't be resolved on its own.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				}
-			]
-		},
-		{
-			"@id": "linkedql:PropertyNamesAs",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "tags the list of predicates that are pointing out from a node.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n940746822461272156",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n1210867092972958176",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:tag"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:ReverseProperties",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "gets all the properties the current entity / value is referenced at",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n6329414099163189091",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Documents",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Documents return documents of the tags matched in the query associated with their entity",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7433399325912852556",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Context",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "A a set of rules for interpreting identifiers used in the query",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n1768103055821382518",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n7575721730139917638",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:rules"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Entity",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to the object matching given identifier in the graph.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n4166020431983508127",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:identifier"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:ReversePropertyNames",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "gets the list of predicates that are pointing in to a node.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n2464135497427566850",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Visit",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to the values of the given property or properties in via of the current objects. If via is a path it's resolved values will be used as properties.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n4828895876415547373",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n5913886908566162065",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:properties"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Both",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "is like View but resolves to both the object values and references to the values of the given properties in via. It is the equivalent for the Union of View and ViewReverse of the same property.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n3354833168033908718",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n2610986507340252118",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:properties"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Back",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to the values of the previous the step or the values assigned to name in a former step.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n4152569219132110953",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n3616423356531866941",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:name"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Follow",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "is the way to use a path prepared with Morphism. Applies the path chain on the morphism object to the current path. Starts as if at the g.M() and follows through the morphism path.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n2571448771423842413",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n768519697284870398",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:followed"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Is",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "resolves to all the values resolved by the from step which are included in provided values.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n7968338612233507568",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Limit",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "limits a number of nodes for current path.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n9095799745556992925",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n7355236888980142565",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:limit"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:Out",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "aliases for View",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n6767029967121782808",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n7430853392391868435",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:properties"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:ReversePropertyNamesAs",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "tags the list of predicates that are pointing in to a node.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n5602417506651241650",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n5893948338205049271",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:tag"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:SelectFirst",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "Like Select but only returns the first result",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n3811863577968292247",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:As",
-			"@type": "rdfs:Class",
-			"rdfs:comment": "assigns the resolved values of the from step to a given name. The name can be used with the Select and Documents steps to retrieve the values or to return to the values in further steps with the Back step. It resolves to the values of the from step.",
-			"rdfs:subClassOf": [
-				{
-					"@id": "linkedql:PathStep"
-				},
-				{
-					"@id": "linkedql:IteratorStep"
-				},
-				{
-					"@id": "_:n6644786403340659318",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:from"
-					}
-				},
-				{
-					"@id": "_:n6729142350378886412",
-					"@type": "owl:Restriction",
-					"owl:cardinality": 1,
-					"owl:onProperty": {
-						"@id": "linkedql:name"
-					}
-				}
-			]
-		},
-		{
-			"@id": "linkedql:identifier",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Entity"
-			},
-			"rdfs:range": {
-				"@id": "owl:Thing"
-			}
-		},
-		{
-			"@id": "linkedql:properties",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n4426113905818118568",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Visit"
-						},
-						{
-							"@id": "linkedql:Both"
-						},
-						{
-							"@id": "linkedql:Out"
-						},
-						{
-							"@id": "linkedql:In"
-						},
-						{
-							"@id": "linkedql:VisitReverse"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "linkedql:PropertyPath"
-			}
-		},
-		{
-			"@id": "linkedql:steps",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n8771074728169473317",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Where"
-						},
-						{
-							"@id": "linkedql:Union"
-						},
-						{
-							"@id": "linkedql:Intersect"
-						},
-						{
-							"@id": "linkedql:Difference"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "linkedql:PathStep"
-			}
-		},
-		{
-			"@id": "linkedql:values",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n2778658082511284513",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Vertex"
-						},
-						{
-							"@id": "linkedql:HasReverse"
-						},
-						{
-							"@id": "linkedql:Has"
-						},
-						{
-							"@id": "linkedql:Is"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "rdfs:Resource"
-			}
-		},
-		{
-			"@id": "linkedql:filter",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Filter"
-			},
-			"rdfs:range": {
-				"@id": "linkedql:Operator"
-			}
-		},
-		{
-			"@id": "linkedql:property",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n5618066493202174473",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:HasReverse"
-						},
-						{
-							"@id": "linkedql:Has"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "linkedql:PropertyPath"
-			}
-		},
-		{
-			"@id": "linkedql:tag",
-			"@type": "owl:DatatypeProperty",
-			"rdfs:domain": {
-				"@id": "_:n1772952699595370000",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:ReversePropertyNamesAs"
-						},
-						{
-							"@id": "linkedql:PropertyNamesAs"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "xsd:string"
-			}
-		},
-		{
-			"@id": "linkedql:name",
-			"@type": "owl:DatatypeProperty",
-			"rdfs:domain": {
-				"@id": "_:n2322580177519383828",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Back"
-						},
-						{
-							"@id": "linkedql:As"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "xsd:string"
-			}
-		},
-		{
-			"@id": "linkedql:offset",
-			"@type": "owl:DatatypeProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Skip"
-			},
-			"rdfs:range": {
-				"@id": "xsd:int"
-			}
-		},
-		{
-			"@id": "linkedql:tags",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n3928455742101872374",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Select"
-						},
-						{
-							"@id": "linkedql:SelectFirst"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "xsd:string"
-			}
-		},
-		{
-			"@id": "linkedql:followed",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n55620557833559896",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:FollowReverse"
-						},
-						{
-							"@id": "linkedql:Follow"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "linkedql:PathStep"
-			}
-		},
-		{
-			"@id": "linkedql:rules",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Context"
-			},
-			"rdfs:range": {
-				"@id": "rdf:JSON"
-			}
-		},
-		{
-			"@id": "linkedql:limit",
-			"@type": "owl:DatatypeProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Limit"
-			},
-			"rdfs:range": {
-				"@id": "xsd:int"
-			}
-		},
-		{
-			"@id": "linkedql:pattern",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Match"
-			},
-			"rdfs:range": {
-				"@id": "rdfg:Graph"
-			}
-		},
-		{
-			"@id": "linkedql:value",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n600411063381020008",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:GreaterThanEquals"
-						},
-						{
-							"@id": "linkedql:LessThan"
-						},
-						{
-							"@id": "linkedql:LessThanEquals"
-						},
-						{
-							"@id": "linkedql:GreaterThan"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "rdfs:Resource"
-			}
-		},
-		{
-			"@id": "linkedql:names",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n3605634284655746448",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Properties"
-						},
-						{
-							"@id": "linkedql:ReverseProperties"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "xsd:string"
-			}
-		},
-		{
-			"@id": "linkedql:identifiers",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Entities"
-			},
-			"rdfs:range": {
-				"@id": "owl:Thing"
-			}
-		},
-		{
-			"@id": "linkedql:step",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "linkedql:Optional"
-			},
-			"rdfs:range": {
-				"@id": "linkedql:PathStep"
-			}
-		},
-		{
-			"@id": "linkedql:from",
-			"@type": "owl:ObjectProperty",
-			"rdfs:domain": {
-				"@id": "_:n5948323423432444652",
-				"@type": "owl:Class",
-				"owl:unionOf": {
-					"@list": [
-						{
-							"@id": "linkedql:Filter"
-						},
-						{
-							"@id": "linkedql:LessThanEquals"
-						},
-						{
-							"@id": "linkedql:GreaterThan"
-						},
-						{
-							"@id": "linkedql:LessThan"
-						},
-						{
-							"@id": "linkedql:Select"
-						},
-						{
-							"@id": "linkedql:Where"
-						},
-						{
-							"@id": "linkedql:PropertyNames"
-						},
-						{
-							"@id": "linkedql:VisitReverse"
-						},
-						{
-							"@id": "linkedql:PropertyNamesAs"
-						},
-						{
-							"@id": "linkedql:Documents"
-						},
-						{
-							"@id": "linkedql:Back"
-						},
-						{
-							"@id": "linkedql:Both"
-						},
-						{
-							"@id": "linkedql:In"
-						},
-						{
-							"@id": "linkedql:Skip"
-						},
-						{
-							"@id": "linkedql:HasReverse"
-						},
-						{
-							"@id": "linkedql:Count"
-						},
-						{
-							"@id": "linkedql:Visit"
-						},
-						{
-							"@id": "linkedql:Out"
-						},
-						{
-							"@id": "linkedql:Difference"
-						},
-						{
-							"@id": "linkedql:As"
-						},
-						{
-							"@id": "linkedql:Order"
-						},
-						{
-							"@id": "linkedql:Properties"
-						},
-						{
-							"@id": "linkedql:GreaterThanEquals"
-						},
-						{
-							"@id": "linkedql:FollowReverse"
-						},
-						{
-							"@id": "linkedql:Is"
-						},
-						{
-							"@id": "linkedql:ReversePropertyNamesAs"
-						},
-						{
-							"@id": "linkedql:Unique"
-						},
-						{
-							"@id": "linkedql:ReverseProperties"
-						},
-						{
-							"@id": "linkedql:ReversePropertyNames"
-						},
-						{
-							"@id": "linkedql:Follow"
-						},
-						{
-							"@id": "linkedql:Union"
-						},
-						{
-							"@id": "linkedql:Has"
-						},
-						{
-							"@id": "linkedql:Limit"
-						},
-						{
-							"@id": "linkedql:SelectFirst"
-						},
-						{
-							"@id": "linkedql:Labels"
-						},
-						{
-							"@id": "linkedql:Match"
-						},
-						{
-							"@id": "linkedql:Value"
-						},
-						{
-							"@id": "linkedql:Intersect"
-						},
-						{
-							"@id": "linkedql:Optional"
-						},
-						{
-							"@id": "linkedql:Context"
-						}
-					]
-				}
-			},
-			"rdfs:range": {
-				"@id": "linkedql:PathStep"
-			}
-		}
-	]
+  "@context": {
+    "linkedql": "http://cayley.io/linkedql#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "linkedql:Step",
+      "@type": "owl:Class"
+    },
+    {
+      "@id": "linkedql:PathStep",
+      "@type": "owl:Class",
+      "rdfs:subClassOf": {
+        "@id": "linkedql:Step"
+      }
+    },
+    {
+      "@id": "linkedql:IteratorStep",
+      "@type": "owl:Class",
+      "rdfs:subClassOf": {
+        "@id": "linkedql:Step"
+      }
+    },
+    {
+      "@id": "linkedql:Back",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to the values of the previous the step or the values assigned to name in a former step.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n3733386272084344176",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n3160421171006866514",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:name"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Count",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to the number of the resolved values of the from step",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n3797977790046767592",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Unique",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "removes duplicate values from the path.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n2487897483251932125",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:SelectFirst",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Like Select but only returns the first result",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n552500973191784917",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:excludeID"
+          }
+        },
+        {
+          "@id": "_:n1274993236215860768",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Vertex",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to all the existing objects and primitive values in the graph. If provided with values resolves to a sublist of all the existing values in the graph.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Visit",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to the values of the given property or properties in via of the current objects. If via is a path it's resolved values will be used as properties.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n5423177705759172413",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n1014490682814283758",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:properties"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Context",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "A a set of rules for interpreting identifiers used in the query",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n9009355920305138001",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n7367063626504221777",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:rules"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Labels",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "gets the list of inbound and outbound quad labels",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n8318416655314275614",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:LessThan",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Less than filters out values that are not less than given value",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n4775086586884767862",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n4789454467065415990",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:value"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:ReversePropertyNames",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "gets the list of predicates that are pointing in to a node.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1024780498996424142",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:FollowReverse",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "is the same as follow but follows the chain in the reverse direction. Flips View and ViewReverse where appropriate, the net result being a virtual predicate followed in the reverse direction. Starts at the end of the morphism and follows it backwards (with appropriate flipped directions) to the g.M() location.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1878179037431675408",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n1512163311782007151",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:followed"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:HasReverse",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "is the same as Has, but sets constraint in reverse direction.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n7076311305970408607",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n941889658619364458",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:property"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Documents",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Documents return documents of the tags matched in the query associated with their entity",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n2528483384180356247",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Where",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "applies each provided step in steps in isolation on from",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6808437822295645771",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Intersect",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to all the same values resolved by the from step and the provided steps.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n2062363053239252048",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Is",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to all the values resolved by the from step which are included in provided values.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n8416530445479057203",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Like",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Like filters out values that do not match given pattern.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n4540834619306388032",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n5241427235708648248",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:likePattern"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Placeholder",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "is like Vertex but resolves to the values in the context it is placed in. It should only be used where a linkedql.PathStep is expected and can't be resolved on its own.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Both",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "is like View but resolves to both the object values and references to the values of the given properties in via. It is the equivalent for the Union of View and ViewReverse of the same property.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n3619730295176225784",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n4409945168460068246",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:properties"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Follow",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "is the way to use a path prepared with Morphism. Applies the path chain on the morphism object to the current path. Starts as if at the g.M() and follows through the morphism path.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n5509915190836373323",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n8076288396630487035",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:followed"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:GreaterThan",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Greater than equals filters out values that are not greater than given value",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6443969551894382965",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n6945958321257138617",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:value"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:In",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "aliases for ViewReverse",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1479992977215168293",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n1452167588204988195",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:properties"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:PropertyNamesAs",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "tags the list of predicates that are pointing out from a node.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1093915832702247441",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n54871656819206990",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:tag"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Match",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "filters all paths which are, at this point, on the subject for the given predicate and object, but do not follow the path, merely filter the possible paths. Usually useful for starting with all nodes, or limiting to a subset depending on some predicate/value pair.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n2418415905435867577",
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          },
+          "owl:minCardinality": 0
+        },
+        {
+          "@id": "_:n231040424842910159",
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          },
+          "owl:maxCardinality": 1
+        },
+        {
+          "@id": "_:n4475973260435643687",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:pattern"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Out",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "aliases for View",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1452882821032491795",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n1679928346092209345",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:properties"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:RegExp",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "RegExp filters out values that do not match given pattern. If includeIRIs is set to true it matches IRIs in addition to literals.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n8596667616843658312",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n6122164826108266267",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:expression"
+          }
+        },
+        {
+          "@id": "_:n2933117121391673610",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:includeIRIs,omitempty"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:ReverseProperties",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "gets all the properties the current entity / value is referenced at",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1500196269536304968",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n2749802626781433742",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:names"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:As",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "assigns the resolved values of the from step to a given name. The name can be used with the Select and Documents steps to retrieve the values or to return to the values in further steps with the Back step. It resolves to the values of the from step.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6933642473299598797",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n8226266007849849920",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:name"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Difference",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to all the values resolved by the from step different then the values resolved by the provided steps. Caution: it might be slow to execute.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6159047947766537970",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Entity",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to the object matching given identifier in the graph.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n5598612568754050262",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:identifier"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Limit",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "limits a number of nodes for current path.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n2580200964292649487",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n3510513472284537592",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:limit"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:ReversePropertyNamesAs",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "tags the list of predicates that are pointing in to a node.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n3748484223356782067",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n6295591289852261933",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:tag"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:LessThanEquals",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Less than equals filters out values that are not less than or equal given value",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1304836654264984168",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n8080926643884828805",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:value"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Optional",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "attempts to follow the given path from the current entity / value, if fails the entity / value will still be kept in the results",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6944313345728863121",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n580704298612197074",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:step"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:PropertyNames",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "gets the list of predicates that are pointing out from a node.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n4663982062038447620",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Properties",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "adds tags for all properties of the current entity",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n4806617551956641167",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n8397393515147726176",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:names"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Value",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Value returns a single value matched in the query",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n7910261836094059869",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:VisitReverse",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "is the inverse of View. Starting with the nodes in `path` on the object, follow the quads with predicates defined by `predicatePath` to their subjects.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n4744957073513701242",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n9056948427109157826",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:properties"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Entities",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "resolves to all the existing objects in the graph. If provided with identifiers resolves to a sublist of all the existing identifiers in the graph.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:GreaterThanEquals",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Greater than equals filters out values that are not greater than or equal given value",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n2127179842521692281",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n7120832849324240500",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:value"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Has",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "filters all paths which are, at this point, on the subject for the given predicate and object, but do not follow the path, merely filter the possible paths. Usually useful for starting with all nodes, or limiting to a subset depending on some predicate/value pair.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n4735841263164970010",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n5513575287054516149",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:property"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Order",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "sorts the results in ascending order according to the current entity / value",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6100497497413090026",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Skip",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "skips a number of nodes for current path.",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n1669876930917204005",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n4595411818570815981",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:offset"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Select",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "Select returns flat records of tags matched in the query",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6888635126335916042",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        },
+        {
+          "@id": "_:n8843786598336095137",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:excludeID"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:Union",
+      "@type": "rdfs:Class",
+      "rdfs:comment": "returns the combined paths of the two queries. Notice that it's per-path, not per-node. Once again, if multiple paths reach the same destination, they might have had different ways of getting there (and different tags).",
+      "rdfs:subClassOf": [
+        {
+          "@id": "linkedql:PathStep"
+        },
+        {
+          "@id": "linkedql:IteratorStep"
+        },
+        {
+          "@id": "_:n6550761755222407439",
+          "@type": "owl:Restriction",
+          "owl:cardinality": 1,
+          "owl:onProperty": {
+            "@id": "linkedql:from"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "linkedql:excludeID",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "_:n2329520269231673224",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:SelectFirst"
+            },
+            {
+              "@id": "linkedql:Select"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "xsd:boolean"
+      }
+    },
+    {
+      "@id": "linkedql:followed",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n7108294784874488941",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:FollowReverse"
+            },
+            {
+              "@id": "linkedql:Follow"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "linkedql:PathStep"
+      }
+    },
+    {
+      "@id": "linkedql:pattern",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Match"
+      },
+      "rdfs:range": {
+        "@id": "rdfg:Graph"
+      }
+    },
+    {
+      "@id": "linkedql:from",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n3115530799642830312",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:FollowReverse"
+            },
+            {
+              "@id": "linkedql:Like"
+            },
+            {
+              "@id": "linkedql:LessThanEquals"
+            },
+            {
+              "@id": "linkedql:Has"
+            },
+            {
+              "@id": "linkedql:Intersect"
+            },
+            {
+              "@id": "linkedql:Follow"
+            },
+            {
+              "@id": "linkedql:Union"
+            },
+            {
+              "@id": "linkedql:Unique"
+            },
+            {
+              "@id": "linkedql:Visit"
+            },
+            {
+              "@id": "linkedql:ReversePropertyNames"
+            },
+            {
+              "@id": "linkedql:Documents"
+            },
+            {
+              "@id": "linkedql:Limit"
+            },
+            {
+              "@id": "linkedql:As"
+            },
+            {
+              "@id": "linkedql:PropertyNames"
+            },
+            {
+              "@id": "linkedql:Back"
+            },
+            {
+              "@id": "linkedql:SelectFirst"
+            },
+            {
+              "@id": "linkedql:Context"
+            },
+            {
+              "@id": "linkedql:Is"
+            },
+            {
+              "@id": "linkedql:GreaterThan"
+            },
+            {
+              "@id": "linkedql:RegExp"
+            },
+            {
+              "@id": "linkedql:Optional"
+            },
+            {
+              "@id": "linkedql:Properties"
+            },
+            {
+              "@id": "linkedql:Labels"
+            },
+            {
+              "@id": "linkedql:Where"
+            },
+            {
+              "@id": "linkedql:PropertyNamesAs"
+            },
+            {
+              "@id": "linkedql:Match"
+            },
+            {
+              "@id": "linkedql:Out"
+            },
+            {
+              "@id": "linkedql:VisitReverse"
+            },
+            {
+              "@id": "linkedql:Order"
+            },
+            {
+              "@id": "linkedql:In"
+            },
+            {
+              "@id": "linkedql:Skip"
+            },
+            {
+              "@id": "linkedql:GreaterThanEquals"
+            },
+            {
+              "@id": "linkedql:Count"
+            },
+            {
+              "@id": "linkedql:LessThan"
+            },
+            {
+              "@id": "linkedql:Both"
+            },
+            {
+              "@id": "linkedql:Difference"
+            },
+            {
+              "@id": "linkedql:ReversePropertyNamesAs"
+            },
+            {
+              "@id": "linkedql:HasReverse"
+            },
+            {
+              "@id": "linkedql:ReverseProperties"
+            },
+            {
+              "@id": "linkedql:Value"
+            },
+            {
+              "@id": "linkedql:Select"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "linkedql:PathStep"
+      }
+    },
+    {
+      "@id": "linkedql:properties",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n3405717645494330988",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:SelectFirst"
+            },
+            {
+              "@id": "linkedql:Visit"
+            },
+            {
+              "@id": "linkedql:Both"
+            },
+            {
+              "@id": "linkedql:In"
+            },
+            {
+              "@id": "linkedql:Out"
+            },
+            {
+              "@id": "linkedql:VisitReverse"
+            },
+            {
+              "@id": "linkedql:Select"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "_:n4151613741843257786",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "xsd:string"
+            },
+            {
+              "@id": "linkedql:PropertyPath"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "@id": "linkedql:expression",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:RegExp"
+      },
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "linkedql:includeIRIs,omitempty",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:RegExp"
+      },
+      "rdfs:range": {
+        "@id": "xsd:boolean"
+      }
+    },
+    {
+      "@id": "linkedql:identifier",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Entity"
+      },
+      "rdfs:range": {
+        "@id": "owl:Thing"
+      }
+    },
+    {
+      "@id": "linkedql:rules",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Context"
+      },
+      "rdfs:range": {
+        "@id": "rdf:JSON"
+      }
+    },
+    {
+      "@id": "linkedql:property",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n6235888581731143717",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:HasReverse"
+            },
+            {
+              "@id": "linkedql:Has"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "linkedql:PropertyPath"
+      }
+    },
+    {
+      "@id": "linkedql:tag",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "_:n2825856406735344068",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:ReversePropertyNamesAs"
+            },
+            {
+              "@id": "linkedql:PropertyNamesAs"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "linkedql:names",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n8808834500082458042",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:ReverseProperties"
+            },
+            {
+              "@id": "linkedql:Properties"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "linkedql:PropertyPath"
+      }
+    },
+    {
+      "@id": "linkedql:limit",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Limit"
+      },
+      "rdfs:range": {
+        "@id": "xsd:int"
+      }
+    },
+    {
+      "@id": "linkedql:step",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Optional"
+      },
+      "rdfs:range": {
+        "@id": "linkedql:PathStep"
+      }
+    },
+    {
+      "@id": "linkedql:name",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "_:n1953990004125017954",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:Back"
+            },
+            {
+              "@id": "linkedql:As"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "linkedql:steps",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n2991230740671710198",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:Where"
+            },
+            {
+              "@id": "linkedql:Intersect"
+            },
+            {
+              "@id": "linkedql:Difference"
+            },
+            {
+              "@id": "linkedql:Union"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "linkedql:PathStep"
+      }
+    },
+    {
+      "@id": "linkedql:likePattern",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Like"
+      },
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "linkedql:identifiers",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Entities"
+      },
+      "rdfs:range": {
+        "@id": "owl:Thing"
+      }
+    },
+    {
+      "@id": "linkedql:offset",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:domain": {
+        "@id": "linkedql:Skip"
+      },
+      "rdfs:range": {
+        "@id": "xsd:int"
+      }
+    },
+    {
+      "@id": "linkedql:values",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n2571262759579604262",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:Vertex"
+            },
+            {
+              "@id": "linkedql:HasReverse"
+            },
+            {
+              "@id": "linkedql:Is"
+            },
+            {
+              "@id": "linkedql:Has"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "rdfs:Resource"
+      }
+    },
+    {
+      "@id": "linkedql:value",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": {
+        "@id": "_:n3019492143541672901",
+        "@type": "owl:Class",
+        "owl:unionOf": {
+          "@list": [
+            {
+              "@id": "linkedql:LessThan"
+            },
+            {
+              "@id": "linkedql:GreaterThan"
+            },
+            {
+              "@id": "linkedql:LessThanEquals"
+            },
+            {
+              "@id": "linkedql:GreaterThanEquals"
+            }
+          ]
+        }
+      },
+      "rdfs:range": {
+        "@id": "rdfs:Resource"
+      }
+    }
+  ]
 }
